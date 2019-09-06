@@ -23,16 +23,20 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
     // flickr image data access object
     private val flickrImageDao : FlickrImageDao? by lazy { DBHelper.getInstance(application)?.flickrImageDao() }
 
-    // live data that will be populated as search results are returned
+    // live data for checking if the image has been favorited
     val imageIsFavorited = MutableLiveData<Boolean>()
+
+    // live data for performing favoriting of the item
+    val imageFavResult = MutableLiveData<Boolean>()
+
+    // live data for performing unfavoriting of the item
+    val imageUnfavResult = MutableLiveData<Boolean>()
 
     // error handler that will post errors that occur
     val errorHandler = MutableLiveData<String>()
 
     fun getImageIsFavorited(id: String) {
-        job?.cancel()
-
-        job = launch {
+        launch {
             flickrImageDao?.let { imgDao ->
                 imgDao.getImage(id)?.let {
                     // it's there. post true
@@ -48,44 +52,37 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-
-    @Suppress("UNCHECKED_CAST")
-    fun performSearch(term : String, perPage: Int = 25) {
-        // cancel any previous requests so we don't stack up request processing
+    fun favoriteImage(img : FlickrImage) {
         job?.cancel()
 
-        when {
-            term.isNotBlank() -> {
-                ///launch the job
-                job = launch {
-                    val request = APIRequest().apply {
-                        requestType = "POST"
-                        params = hashMapOf(
-                            "api_key" to BuildConfig.FlickrApiKey,
-                            "method" to "flickr.photos.search",
-                            "text" to term,
-                            "format" to "json",
-                            "per_page" to "$perPage",
-                            "nojsoncallback" to "1"
-                        )
-                    }
+        job = launch {
+            flickrImageDao?.let { imgDao ->
+                // remove from db
+                imgDao.insert(img)
 
-                    val result = APIHandler.apiCall(request, FlickrJsonAdapter())
-
-                    // make sure the job wasn't cancelled. if so, we need not send the previous result
-                    if (!job!!.isCancelled) {
-                        when (result) {
-                            is Result.Success -> {
-                                flickrImagesLiveData.postValue(result.data as ImageSearchResponse)
-                            }
-                            is Result.Error -> {
-                                errorHandler.postValue(result.exception.message ?: "An error has occurred.")
-                            }
-                        }
-                    }
-                }
+                // make sure it was inserted into the db
+                imageFavResult.postValue(imgDao.getImage(img.id)?.let { true } ?: run { false })
+            } ?: run {
+                // eesh. something went wrong the the dao. return false
+                errorHandler.postValue("An error has occurred while attempting to favorite this image.")
             }
-            else -> flickrImagesLiveData.postValue(null)
+        }
+    }
+
+    fun unfavoriteImage(img : FlickrImage) {
+        job?.cancel()
+
+        job = launch {
+            flickrImageDao?.let { imgDao ->
+                // remove from db
+                imgDao.delete(img)
+
+                // make sure it was removed into the db
+                imageUnfavResult.postValue(imgDao.getImage(img.id)?.let { false } ?: run { true })
+            } ?: run {
+                // eesh. something went wrong the the dao. return false
+                errorHandler.postValue("An error has occurred while attempting to unfavorite this image.")
+            }
         }
     }
 

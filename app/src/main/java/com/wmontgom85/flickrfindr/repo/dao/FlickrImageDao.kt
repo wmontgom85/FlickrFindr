@@ -15,7 +15,7 @@ public interface FlickrImageDao {
     fun getImage(id: String) : FlickrImage?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(image: FlickrImage) : Long
+    fun insert(image: FlickrImage)
 
     @Query("DELETE FROM FlickrImage WHERE id = :pId")
     fun delete(pId: String)

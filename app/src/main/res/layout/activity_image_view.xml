@@ -8,6 +8,7 @@
         tools:context=".ui.activity.ImageViewActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:theme="@style/AppTheme.AppBarOverlay">
@@ -21,7 +22,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_image_view"/>
+    <include layout="@layout/content_image_view" android:id="@+id/content"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fav_image"
@@ -30,5 +31,20 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@drawable/ic_fav"/>
+
+    <RelativeLayout
+            android:id="@+id/loading_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?android:attr/actionBarSize"
+            android:visibility="visible">
+
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Holo.ProgressBar.Large"
+                android:layout_centerInParent="true" />
+
+    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

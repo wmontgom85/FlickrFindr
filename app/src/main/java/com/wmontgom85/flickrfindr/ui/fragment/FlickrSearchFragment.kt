@@ -14,10 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
-import com.squareup.picasso.Picasso
 import com.wmontgom85.flickrfindr.R
 import com.wmontgom85.flickrfindr.repo.model.FlickrImage
 import com.wmontgom85.flickrfindr.supp.debounce
@@ -35,7 +35,7 @@ import kotlinx.coroutines.MainScope
 class FlickrSearchFragment : Fragment() {
     val FAVORITED_IMAGE_RESULT = 100
 
-    private var listener: FavoritesFragment.OnFragmentInteractionListener? = null
+    private var listener: FlickrSearchFragment.OnFragmentInteractionListener? = null
 
     private lateinit var flickrSearchViewModel: FlickrSearchViewModel
 
@@ -58,12 +58,13 @@ class FlickrSearchFragment : Fragment() {
         val layoutManager = FlexboxLayoutManager(activity)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.justifyContent = JustifyContent.SPACE_AROUND
-
         imageList.layoutManager = layoutManager
 
+        // create the adapter
         adapter = SearchImageAdapter()
         imageList.adapter = adapter
 
+        // listen to search query changes
         val onTextChange: (String) -> Unit = debounce(300L, MainScope(), this::performSearch)
         root.search_input.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
@@ -93,7 +94,7 @@ class FlickrSearchFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is FavoritesFragment.OnFragmentInteractionListener) {
+        if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
             throw RuntimeException("$context must implement FavoritesFragment.OnFragmentInteractionListener")
@@ -134,8 +135,7 @@ class FlickrSearchFragment : Fragment() {
      * activity.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        // fun onFragmentInteraction(uri: Uri)
+        fun reloadFavorites()
     }
 
     companion object {
@@ -170,17 +170,27 @@ class FlickrSearchFragment : Fragment() {
 
                 // create launch function for click action
                 val cb = fun(v: View) {
-                    var i : Intent = Intent(activity, ImageViewActivity::class.java)
+                    val i = Intent(activity, ImageViewActivity::class.java)
                     i.putExtra("image", holder.image)
                     val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
                         "image_to_full_transition")
-                    activity?.startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
+                    startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
                 }
 
                 val menuAction: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)
                 holder.imageview.setOnClickListener(menuAction) // bind click action to avatar
 
                 holder.populate()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            FAVORITED_IMAGE_RESULT -> {
+                listener?.reloadFavorites()
             }
         }
     }
@@ -195,14 +205,18 @@ class FlickrSearchFragment : Fragment() {
 
         fun populate() {
             image?.let {
-                Picasso.get()
+                Glide.with(imageview)
+                    .asBitmap()
                     .load(it.getThumbnail())
-                    .placeholder(R.mipmap.default_image)
-                    .error(R.mipmap.default_image)
+                    .centerCrop()
+                    .placeholder(R.mipmap.default_thumb)
+                    .error(R.mipmap.default_thumb)
+                    .fallback(R.mipmap.default_thumb)
                     .into(imageview)
+
                 name.text = it.title
             } ?: run {
-                imageview.setImageResource(R.mipmap.default_image)
+                imageview.setImageResource(R.mipmap.default_thumb)
                 name.text = ""
             }
         }

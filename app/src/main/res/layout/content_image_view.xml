@@ -11,23 +11,8 @@
         android:background="@drawable/gradient_trans_blue">
 
     <ImageView android:id="@+id/full_image"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
                android:layout_centerInParent="true"/>
-
-    <LinearLayout
-            android:id="@+id/loading_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
-
-        <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@android:style/Widget.Holo.ProgressBar.Large"
-                android:layout_centerInParent="true" />
-
-    </LinearLayout>
-
 
 </RelativeLayout>

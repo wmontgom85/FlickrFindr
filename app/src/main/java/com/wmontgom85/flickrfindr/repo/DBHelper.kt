@@ -25,7 +25,8 @@ abstract class DBHelper : RoomDatabase() {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
                         DBHelper::class.java, "flickr.db"
-                    ).build()
+                    )
+                    .build()
                 }
             }
             return INSTANCE

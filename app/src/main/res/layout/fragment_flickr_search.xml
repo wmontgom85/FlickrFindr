@@ -28,12 +28,12 @@
             style="@android:style/Widget.Holo.ProgressBar.Horizontal"
             android:indeterminate="true" />
 
-        <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/images_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"
-                android:clipToPadding="false"
-                android:layout_marginTop="10dp"/>
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/images_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:clipToPadding="false"
+            android:layout_marginTop="10dp"/>
 
 </LinearLayout>
