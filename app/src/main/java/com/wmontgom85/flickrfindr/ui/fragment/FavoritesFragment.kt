@@ -1,5 +1,6 @@
 package com.wmontgom85.flickrfindr.ui.fragment
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
@@ -144,16 +145,35 @@ class FavoritesFragment : Fragment() {
                 // create launch function for click action
                 val cb = fun(v: View) {
                     val i = Intent(activity, ImageViewActivity::class.java)
+
                     i.putExtra("image", holder.image)
-                    val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
-                        "image_to_full_transition")
-                    activity?.startActivityForResult(i, UNFAVORITED_IMAGE_RESULT, options.toBundle())
+                    val options = ActivityOptions.makeSceneTransitionAnimation(
+                        activity, holder.imageview,
+                        "image_to_full_transition"
+                    )
+                    startActivityForResult(i, UNFAVORITED_IMAGE_RESULT, options.toBundle())
                 }
 
                 val menuAction: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)
                 holder.imageview.setOnClickListener(menuAction) // bind click action to avatar
 
                 holder.populate()
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            UNFAVORITED_IMAGE_RESULT -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    data?.let {
+                        if (it.getBooleanExtra("status_changed", false)) {
+                            reloadImages()
+                        }
+                    }
+                }
             }
         }
     }

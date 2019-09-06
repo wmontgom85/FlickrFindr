@@ -12,7 +12,7 @@ import com.wmontgom85.flickrfindr.repo.model.FlickrImage
  */
 @Database(entities = [
     FlickrImage::class
-], version = 1)
+], version = 1, exportSchema = false)
 abstract class DBHelper : RoomDatabase() {
     abstract fun flickrImageDao(): FlickrImageDao
 

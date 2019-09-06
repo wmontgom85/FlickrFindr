@@ -1,6 +1,8 @@
 package com.wmontgom85.flickrfindr.ui.activity
 
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -58,37 +60,45 @@ class ImageViewActivity : AppCompatActivity() {
                     loading_image.visibility = View.GONE
             }
 
-            // load the iamge using glide
-            Glide.with(this)
-                .asBitmap()
-                .load(image.getLargeImage())
-                .centerInside()
-                .listener(object: RequestListener<Bitmap> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        Log.d("Glide", "message: ${e?.message}")
-                        imageCB()
-                        showMessage("Oh no!", "An error occurred while loading this image.")
-                        return false
-                    }
+            val bm = image.getImage()
 
-                    override fun onResourceReady(
-                        resource: Bitmap?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        image.setImageBytes(resource)
-                        imageCB()
-                        return false
-                    }
-                })
-                .into(full_image)
+            // first try to load the cached image from disk
+            bm?.let { bitmap ->
+                full_image.setImageBitmap(bitmap)
+                imageCB()
+            } ?: run {
+                // load the iamge using glide
+                Glide.with(this)
+                    .asBitmap()
+                    .load(image.getLargeImage())
+                    .centerInside()
+                    .listener(object : RequestListener<Bitmap> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Bitmap>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            Log.d("Glide", "message: ${e?.message}")
+                            imageCB()
+                            showMessage("Oh no!", "An error occurred while loading this image.")
+                            return false
+                        }
+
+                        override fun onResourceReady(
+                            resource: Bitmap?,
+                            model: Any?,
+                            target: Target<Bitmap>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            image.storeImage(applicationContext, resource)
+                            imageCB()
+                            return false
+                        }
+                    })
+                    .into(full_image)
+            }
 
             // image.setImageBytes(bitmap)
 
@@ -183,7 +193,7 @@ class ImageViewActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                finish()
+                onBackPressed()
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -204,11 +214,13 @@ class ImageViewActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-
         // if the image fav status was changed, we need to signal the main activity to update the favorites list
         if (favoriteStatusChanged) {
-
+            val data = Intent()
+            data.putExtra("status_changed", true)
+            setResult(Activity.RESULT_OK, data)
         }
+
+        finish()
     }
 }

@@ -1,5 +1,6 @@
 package com.wmontgom85.flickrfindr.ui.fragment
 
+import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
@@ -190,7 +191,13 @@ class FlickrSearchFragment : Fragment() {
 
         when (requestCode) {
             FAVORITED_IMAGE_RESULT -> {
-                listener?.reloadFavorites()
+                if (resultCode == Activity.RESULT_OK) {
+                    data?.let {
+                        if (it.getBooleanExtra("status_changed", false)) {
+                            listener?.reloadFavorites()
+                        }
+                    }
+                }
             }
         }
     }

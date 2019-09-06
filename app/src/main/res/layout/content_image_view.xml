@@ -13,6 +13,7 @@
     <ImageView android:id="@+id/full_image"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
-               android:layout_centerInParent="true"/>
+               android:layout_centerInParent="true"
+               android:transitionName="image_to_full_transition"/>
 
 </RelativeLayout>
