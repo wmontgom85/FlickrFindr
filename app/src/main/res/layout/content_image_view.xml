@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,6 +7,27 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_image_view"
-        tools:context=".ui.activity.ImageViewActivity">
+        tools:context=".ui.activity.ImageViewActivity"
+        android:background="@drawable/gradient_trans_blue">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView android:id="@+id/full_image"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_centerInParent="true"/>
+
+    <LinearLayout
+            android:id="@+id/loading_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+        <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Widget.Holo.ProgressBar.Large"
+                android:layout_centerInParent="true" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

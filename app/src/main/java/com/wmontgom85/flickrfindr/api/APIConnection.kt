@@ -1,7 +1,7 @@
 package com.wmontgom85.flickrfindr.api
 
 import android.util.Log
-import com.wmontgom85.flickrfindr.sealed.APIResult
+import com.wmontgom85.flickrfindr.sealed.Result
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -17,7 +17,7 @@ class APIConnection(
     /**
      * Makes an HTTP request with a provided APIRequest object
      */
-    fun <T: Any> makeRequest(): APIResult<T> {
+    fun <T: Any> makeRequest(): Result<T> {
         var response = ""
 
         var connection : HttpURLConnection? = null
@@ -54,15 +54,15 @@ class APIConnection(
                     br.readLine().forEach {
                         response += it
                     }
-                    APIResult.Success(response)
+                    Result.Success(response)
                 }
-                else -> APIResult.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP001"))
+                else -> Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP001"))
             }
         } catch (tx: Throwable) {
             Log.d("1.APIConnection", tx.message)
 
             // set the connection to null so no further execution can occur
-            return APIResult.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP002"))
+            return Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP002"))
         } finally {
             connection?.disconnect()
         }

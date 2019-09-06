@@ -25,7 +25,7 @@ data class FlickrImage (
 
     fun getThumbnail() = "https://farm${farm}.staticflickr.com/${server}/${id}_${secret}_m.jpg"
 
-    fun getImageUrl() = "https://farm${farm}.staticflickr.com/${server}/${id}_${secret}.jpg"
+    fun getLargeImage() = "https://farm${farm}.staticflickr.com/${server}/${id}_${secret}_b.jpg"
 
     fun setThumbnailByes(bitmap : Bitmap) {
 

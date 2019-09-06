@@ -23,7 +23,6 @@ import com.wmontgom85.flickrfindr.repo.model.FlickrImage
 import com.wmontgom85.flickrfindr.supp.debounce
 import com.wmontgom85.flickrfindr.supp.inflate
 import com.wmontgom85.flickrfindr.supp.throttleFirst
-import com.wmontgom85.flickrfindr.ui.activity.FullScreenImageActivity
 import com.wmontgom85.flickrfindr.ui.activity.ImageViewActivity
 import com.wmontgom85.flickrfindr.viewmodel.FlickrSearchViewModel
 import kotlinx.android.synthetic.main.fragment_flickr_search.*

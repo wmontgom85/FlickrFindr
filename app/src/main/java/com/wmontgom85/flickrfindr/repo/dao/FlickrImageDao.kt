@@ -9,16 +9,16 @@ import com.wmontgom85.flickrfindr.repo.model.FlickrImage
 @Dao
 public interface FlickrImageDao {
     @Query("SELECT * FROM FlickrImage")
-    fun getImages(): List<FlickrImage>
+    fun getImages(): List<FlickrImage>?
 
     @Query("SELECT * FROM FlickrImage WHERE id = :id")
-    fun getImage(id: Long) : FlickrImage
+    fun getImage(id: String) : FlickrImage?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(image: FlickrImage) : Long
 
     @Query("DELETE FROM FlickrImage WHERE id = :pId")
-    fun delete(pId: Int)
+    fun delete(pId: String)
 
     @Delete
     fun delete(image: FlickrImage)
