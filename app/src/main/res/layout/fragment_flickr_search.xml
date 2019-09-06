@@ -1,0 +1,39 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.fragment.FlickrSearchFragment"
+        android:focusableInTouchMode="true">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        app:queryHint="Search Images"
+        android:layout_margin="5dp"
+        android:imeOptions="actionSearch|flagNoExtractUi|flagNoFullscreen"
+        app:iconifiedByDefault="false"/>
+
+    <ProgressBar
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:visibility="gone"
+            style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+            android:indeterminate="true" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/images_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:clipToPadding="false"
+                android:layout_marginTop="10dp"/>
+
+</LinearLayout>
