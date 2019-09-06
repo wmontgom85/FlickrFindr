@@ -18,7 +18,7 @@
         app:queryHint="Search Images"
         android:layout_margin="5dp"
         android:imeOptions="actionSearch|flagNoExtractUi|flagNoFullscreen"
-        app:iconifiedByDefault="false"/>
+        app:iconifiedByDefault="false" />
 
     <ProgressBar
             android:id="@+id/loading"
@@ -27,6 +27,52 @@
             android:visibility="gone"
             style="@android:style/Widget.Holo.ProgressBar.Horizontal"
             android:indeterminate="true" />
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:paddingStart="15dp"
+                  android:paddingEnd="15dp"
+                  android:layout_marginTop="5dp"
+                  android:weightSum="2"
+                  android:gravity="center_vertical">
+
+        <TextView android:id="@+id/image_total"
+                  android:layout_width="0dp"
+                  android:layout_weight="1"
+                  android:layout_height="wrap_content"
+                  android:textAlignment="textStart"
+                  android:text="0 results"
+                  android:textSize="16sp"
+                  android:visibility="invisible"/>
+
+        <LinearLayout android:layout_width="0dp"
+                      android:layout_weight="1"
+                      android:layout_height="wrap_content"
+                      android:gravity="center_vertical|end">
+
+            <TextView android:id="@+id/per_page"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="25"
+                      android:textSize="16sp"
+                      android:paddingStart="7dp"
+                      android:paddingEnd="7dp"
+                      android:paddingTop="3dp"
+                      android:paddingBottom="3dp"
+                      android:background="@drawable/border_5dp_a6a6a6_s_fff_b"/>
+
+            <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textAlignment="textEnd"
+                  android:text="per page"
+            android:layout_marginStart="5dp"
+            android:textSize="16sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/images_list"

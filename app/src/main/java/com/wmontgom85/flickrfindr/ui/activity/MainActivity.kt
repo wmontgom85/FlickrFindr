@@ -12,11 +12,13 @@ import com.wmontgom85.flickrfindr.R
 import com.wmontgom85.flickrfindr.ui.fragment.FavoritesFragment
 import com.wmontgom85.flickrfindr.ui.fragment.FlickrSearchFragment
 
+
 class MainActivity : AppCompatActivity(),
     FavoritesFragment.OnFragmentInteractionListener,
     FlickrSearchFragment.OnFragmentInteractionListener
 {
     private lateinit var sectionsPagerAdapter : SectionsPagerAdapter
+
     private val TAB_TITLES = arrayOf(
         R.string.search_tab,
         R.string.fav_tab

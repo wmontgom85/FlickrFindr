@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -20,6 +21,7 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.wmontgom85.flickrfindr.R
+import com.wmontgom85.flickrfindr.api.response.ImageSearchResponse
 import com.wmontgom85.flickrfindr.repo.model.FlickrImage
 import com.wmontgom85.flickrfindr.supp.debounce
 import com.wmontgom85.flickrfindr.supp.inflate
@@ -30,10 +32,12 @@ import kotlinx.android.synthetic.main.fragment_flickr_search.*
 import kotlinx.android.synthetic.main.fragment_flickr_search.view.*
 import kotlinx.coroutines.MainScope
 
+
+
 /**
  * A placeholder fragment containing a simple view.
  */
-class FlickrSearchFragment : Fragment() {
+class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     val FAVORITED_IMAGE_RESULT = 100
 
     private var listener: FlickrSearchFragment.OnFragmentInteractionListener? = null
@@ -45,6 +49,8 @@ class FlickrSearchFragment : Fragment() {
     private lateinit var imageList : RecyclerView
 
     private var images : List<FlickrImage>? = null
+
+    private var itemsPerPage = 25
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +71,13 @@ class FlickrSearchFragment : Fragment() {
         adapter = SearchImageAdapter()
         imageList.adapter = adapter
 
+        // create the live data observer
+        flickrSearchViewModel.flickrImagesLiveData.observe(this, Observer {
+            refreshList(it)
+        })
+
         // listen to search query changes
-        val onTextChange: (String) -> Unit = debounce(300L, MainScope(), this::performSearch)
+        val onTextChange: (String) -> Unit = debounce(500L, MainScope(), this::performSearch)
         root.search_input.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String): Boolean {
                 loading.visibility = View.VISIBLE
@@ -79,19 +90,13 @@ class FlickrSearchFragment : Fragment() {
             override fun onQueryTextSubmit(query: String): Boolean = true
         })
 
-        // create the live data observer
-        flickrSearchViewModel.flickrImagesLiveData.observe(this, Observer {
-            it?.let {
-                images = it.photos // set the images list to the response images
-            } ?: run {
-                images = null
-            }
-
-            refreshList()
-        })
+        // per page listener
+        val onPerPageSelected: (View) -> Unit = debounce(500L, MainScope(), this::changePerPage)
+        root.per_page.setOnClickListener(onPerPageSelected)
 
         return root
     }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -115,16 +120,62 @@ class FlickrSearchFragment : Fragment() {
     }
 
     /**
+     * Updates the per page count
+     */
+    private fun changePerPage(v: View) {
+        activity?.let {
+            val numberPicker = NumberPickerDialog()
+            numberPicker.valueChangeListener = this
+            numberPicker.show(it.supportFragmentManager, "per_page_picker")
+        }
+    }
+
+    /**
+     * Value change listener for per page selection
+     */
+    override fun onValueChange(p0: NumberPicker?, p1: Int, p2: Int) {
+        val newPerPage = when (p1) {
+            0 -> 10
+            1 -> 25
+            2 -> 50
+            else -> 100
+        }
+
+        if (newPerPage != itemsPerPage) {
+            // per page updated. trigger query
+            itemsPerPage = newPerPage
+            per_page.text = "$newPerPage"
+
+            if (search_input.query.isNotBlank()) {
+                performSearch(search_input.query.toString())
+            }
+        }
+    }
+
+    /**
      * Fire off the image search
      */
     private fun performSearch(term: String) {
-        flickrSearchViewModel.performSearch(term)
+        flickrSearchViewModel.performSearch(term, itemsPerPage)
     }
 
     /**
      * Refreshes the images list with the new data
      */
-    private fun refreshList() {
+    private fun refreshList(imageResponse : ImageSearchResponse?) {
+        imageResponse?.let {
+            images = it.photos // set the images list to the response images
+            image_total.text = when (it.total) {
+                1L -> "1 result"
+                else -> "${it.total} results"
+            }
+            image_total.visibility = View.VISIBLE
+        } ?: run {
+            images = null
+            image_total.text = "0 results"
+            image_total.visibility = View.INVISIBLE
+        }
+
         loading.visibility = View.GONE
         adapter.notifyDataSetChanged()
     }
