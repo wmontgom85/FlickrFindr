@@ -16,14 +16,14 @@
         android:clickable="true"
         android:focusable="true"
         app:queryHint="Search Images"
-        android:layout_margin="5dp"
+        android:layout_margin="@dimen/shallow_margin"
         android:imeOptions="actionSearch|flagNoExtractUi|flagNoFullscreen"
         app:iconifiedByDefault="false" />
 
     <ProgressBar
             android:id="@+id/loading"
             android:layout_width="match_parent"
-            android:layout_height="10dp"
+            android:layout_height="@dimen/spaced_margin"
             android:visibility="gone"
             style="@android:style/Widget.Holo.ProgressBar.Horizontal"
             android:indeterminate="true" />
@@ -31,9 +31,9 @@
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal"
-                  android:paddingStart="15dp"
-                  android:paddingEnd="15dp"
-                  android:layout_marginTop="5dp"
+                  android:paddingStart="@dimen/deep_margin"
+                  android:paddingEnd="@dimen/deep_margin"
+                  android:layout_marginTop="@dimen/shallow_margin"
                   android:weightSum="2"
                   android:gravity="center_vertical">
 
@@ -42,8 +42,8 @@
                   android:layout_weight="1"
                   android:layout_height="wrap_content"
                   android:textAlignment="textStart"
-                  android:text="0 results"
-                  android:textSize="16sp"
+                  android:text="@string/empty_results"
+                  android:textSize="@dimen/text_label"
                   android:visibility="invisible"/>
 
         <LinearLayout android:layout_width="0dp"
@@ -55,7 +55,7 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:text="25"
-                      android:textSize="16sp"
+                      android:textSize="@dimen/text_label"
                       android:paddingStart="7dp"
                       android:paddingEnd="7dp"
                       android:paddingTop="3dp"
@@ -66,9 +66,9 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:textAlignment="textEnd"
-                  android:text="per page"
-            android:layout_marginStart="5dp"
-            android:textSize="16sp"/>
+                  android:text="@string/per_page"
+                  android:layout_marginStart="@dimen/shallow_margin"
+                  android:textSize="@dimen/text_label"/>
 
         </LinearLayout>
 
@@ -80,6 +80,6 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:clipToPadding="false"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="@dimen/spaced_margin"/>
 
 </LinearLayout>

@@ -5,8 +5,6 @@ import android.widget.NumberPicker
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 
-
-
 class NumberPickerDialog : DialogFragment() {
     var valueChangeListener: NumberPicker.OnValueChangeListener? = null
 
@@ -25,7 +23,7 @@ class NumberPickerDialog : DialogFragment() {
             valueChangeListener!!.onValueChange(numberPicker, numberPicker.value, numberPicker.value)
         }
         alertBuilder.setNegativeButton("Cancel") { dialog, _ ->
-            valueChangeListener!!.onValueChange(numberPicker, numberPicker.value, numberPicker.value)
+           dialog.dismiss()
         }
 
         alertBuilder.setView(numberPicker)

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
@@ -25,6 +30,7 @@ import com.wmontgom85.flickrfindr.api.response.ImageSearchResponse
 import com.wmontgom85.flickrfindr.repo.model.FlickrImage
 import com.wmontgom85.flickrfindr.supp.debounce
 import com.wmontgom85.flickrfindr.supp.inflate
+import com.wmontgom85.flickrfindr.supp.showMessage
 import com.wmontgom85.flickrfindr.supp.throttleFirst
 import com.wmontgom85.flickrfindr.ui.activity.ImageViewActivity
 import com.wmontgom85.flickrfindr.viewmodel.FlickrSearchViewModel
@@ -222,11 +228,48 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
                 // create launch function for click action
                 val cb = fun(v: View) {
-                    val i = Intent(activity, ImageViewActivity::class.java)
-                    i.putExtra("image", holder.image)
-                    val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
-                        "image_to_full_transition")
-                    startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
+                    if (loading.visibility == View.VISIBLE) {
+                        // we're loading an image already. halt execution
+                        return
+                    }
+
+                    loading.visibility = View.VISIBLE
+
+                    // attempt preload of large image for quicker rendering
+                    Glide.with(holder.imageview)
+                        .load(holder.image?.getLargeImage())
+                        .listener(object : RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                loading.visibility = View.GONE
+
+                                activity?.showMessage("Whoops!", "The image failed to load. Please try again")
+                                return false
+                            }
+
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                // image is now preloaded and cached through Glide. send user to activity
+                                val i = Intent(activity, ImageViewActivity::class.java)
+                                i.putExtra("image", holder.image)
+                                val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
+                                    "image_to_full_transition")
+                                startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
+
+                                loading.visibility = View.GONE
+
+                                return true
+                            }
+                        }).preload()
                 }
 
                 val menuAction: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)

@@ -10,4 +10,6 @@
     <string name="search_hint">Search Flickr</string>
     <string name="voice">Use Voice</string>
 
+    <string name="empty_results">0 results</string>
+    <string name="per_page">per page</string>
 </resources>

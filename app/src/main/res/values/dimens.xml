@@ -7,4 +7,13 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="card_elevation">5dp</dimen>
     <dimen name="card_radius">5dp</dimen>
+
+    <!-- margins -->
+    <dimen name="shallow_margin">5dp</dimen>
+    <dimen name="spaced_margin">10dp</dimen>
+    <dimen name="deep_margin">15dp</dimen>
+
+    <!-- text sizes -->
+    <dimen name="text_label">16sp</dimen>
+    <dimen name="name_label">16sp</dimen>
 </resources>
