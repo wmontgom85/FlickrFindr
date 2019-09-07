@@ -3,13 +3,14 @@
     <!-- flickr blue = #055dd8 -->
     <!-- flickr pink = #fb0580 -->
 
-    <color name="colorPrimary">#99000000</color>
+    <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#000000</color>
     <color name="white">#ffffff</color>
 
     <color name="black_overlay">#66000000</color>
     <color name="black_50">#80000000</color>
+    <color name="black_60">#99000000</color>
     <color name="black_75">#BF000000</color>
     <color name="white_75">#BFFFFFFF</color>
 </resources>

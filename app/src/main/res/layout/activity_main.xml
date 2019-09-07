@@ -21,6 +21,7 @@
                 app:tabIndicatorColor="@color/white"
                 app:tabTextColor="@color/white"
                 app:tabMode="fixed"
+                app:tabMaxWidth="0dp"
                 app:tabGravity="fill"/>
 
     </com.google.android.material.appbar.AppBarLayout>
