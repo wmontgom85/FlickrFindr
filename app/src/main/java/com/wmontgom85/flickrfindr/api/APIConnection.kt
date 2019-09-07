@@ -59,7 +59,7 @@ class APIConnection(
                 else -> Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP001"))
             }
         } catch (tx: Throwable) {
-            Log.d("1.APIConnection", tx.message)
+            tx.printStackTrace()
 
             // set the connection to null so no further execution can occur
             return Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP002"))

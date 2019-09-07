@@ -7,7 +7,7 @@ import com.wmontgom85.flickrfindr.repo.model.FlickrImage
  * Flickr Image Data Access Object
  */
 @Dao
-public interface FlickrImageDao {
+interface FlickrImageDao {
     @Query("SELECT * FROM FlickrImage")
     fun getImages(): List<FlickrImage>?
 

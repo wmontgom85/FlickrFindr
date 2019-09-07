@@ -55,8 +55,6 @@ class MainActivity : AppCompatActivity(),
         tabs.setupWithViewPager(viewPager)
     }
 
-
-
     /**
      * Users to signal a reload needs to occur with the favorites fragment
      */

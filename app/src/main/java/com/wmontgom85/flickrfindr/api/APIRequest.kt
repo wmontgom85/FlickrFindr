@@ -14,6 +14,10 @@ class APIRequest {
 
     var timeout : Int = 15000
 
+    /**
+     * Builds the POST string to be input during the request
+     * @return String
+     */
     fun buildQuery() : String? {
         try {
             var builder = Uri.Builder()
@@ -25,7 +29,9 @@ class APIRequest {
             }
 
             return builder.build().encodedQuery
-        } catch (tx: Throwable) {}
+        } catch (tx: Throwable) {
+            tx.printStackTrace()
+        }
 
         return null
     }

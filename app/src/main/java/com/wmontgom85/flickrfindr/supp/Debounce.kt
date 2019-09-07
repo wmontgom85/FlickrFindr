@@ -1,6 +1,5 @@
 package com.wmontgom85.flickrfindr.supp
 
-import android.widget.SearchView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

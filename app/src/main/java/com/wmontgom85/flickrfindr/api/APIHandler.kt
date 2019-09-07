@@ -1,11 +1,13 @@
 package com.wmontgom85.flickrfindr.api
 
-import android.util.Log
 import com.wmontgom85.flickrfindr.api.jsonadapter.Parser
 import com.wmontgom85.flickrfindr.sealed.Result
-import org.xml.sax.helpers.ParserAdapter
 
 object APIHandler {
+    /**
+     * Makes the API call and returns the Result
+     * @return Result<Any>
+     */
     fun apiCall(request: APIRequest, parser: Parser): Result<Any> {
         val result: Result<Any> = APIConnection(request).makeRequest()
 
@@ -20,7 +22,7 @@ object APIHandler {
                         return Result.Error(Exception("An error has occurred while parsing. Error code AH001"))
                     }
                 } catch (tx : Throwable) {
-                    Log.d("1.APIHandler", tx.message)
+                    tx.printStackTrace()
 
                     // fatal error
                     return Result.Error(Exception("An error has occurred while parsing. Error code AH002"))

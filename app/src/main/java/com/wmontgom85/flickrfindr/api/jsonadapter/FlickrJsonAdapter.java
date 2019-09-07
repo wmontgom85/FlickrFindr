@@ -1,5 +1,6 @@
 package com.wmontgom85.flickrfindr.api.jsonadapter;
 
+import android.util.Log;
 import com.wmontgom85.flickrfindr.api.response.ImageSearchResponse;
 import com.wmontgom85.flickrfindr.repo.model.FlickrImage;
 import org.json.JSONArray;
@@ -39,6 +40,7 @@ public class FlickrJsonAdapter implements Parser {
                     }
                 }
 
+                // build the response object with the pertinent data
                 return new ImageSearchResponse(
                     photos.getInt("page"),
                     photos.getInt("pages"),
@@ -49,12 +51,10 @@ public class FlickrJsonAdapter implements Parser {
             }
         } catch (JSONException e) {
             // there was an error parsing the json
-            e.printStackTrace();
-            // Log.d("FlickrJsonAdapter", String.format("parse error: %s", e.getMessage()));
+            Log.d("FlickrJsonAdapter", String.format("parse error: %s", e.getMessage()));
         } catch (Throwable tx) {
             // there was an error parsing the json
             tx.printStackTrace();
-            // Log.d("FlickrJsonAdapter", String.format("exception: %s", tx.getMessage()));
         }
 
         return null;

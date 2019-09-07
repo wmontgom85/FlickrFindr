@@ -35,6 +35,9 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
     // error handler that will post errors that occur
     val errorHandler = MutableLiveData<String>()
 
+    /**
+     * Checks if the image has been favorited so we can preselect the fav FAB
+     */
     fun getImageIsFavorited(id: String) {
         launch {
             flickrImageDao?.let { imgDao ->
@@ -52,6 +55,9 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    /**
+     * Processes the favoriting of an image
+     */
     fun favoriteImage(img : FlickrImage) {
         job?.cancel()
 
@@ -69,6 +75,9 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    /**
+     * Processes the unfavoriting of an image
+     */
     fun unfavoriteImage(img : FlickrImage) {
         job?.cancel()
 
@@ -76,6 +85,9 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
             flickrImageDao?.let { imgDao ->
                 // remove from db
                 imgDao.delete(img)
+
+                // remove local file
+                img.deleteImage()
 
                 // make sure it was removed into the db
                 imageUnfavResult.postValue(imgDao.getImage(img.id)?.let { false } ?: run { true })
@@ -86,6 +98,8 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    // cancels coroutine scope and all children
+    /**
+     * cancels coroutine scope and all children
+     */
     fun cancelRequest() = job?.cancel()
 }

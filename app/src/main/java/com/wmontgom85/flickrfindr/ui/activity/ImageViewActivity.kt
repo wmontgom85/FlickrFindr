@@ -1,21 +1,17 @@
 package com.wmontgom85.flickrfindr.ui.activity
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.transition.Transition
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.Window
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.transition.Explode
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -40,6 +36,7 @@ class ImageViewActivity : AppCompatActivity() {
     private var favoriteStatusChanged = false
 
     private lateinit var imageViewModel: FlickrImageViewModel
+    private var imgBitmap : Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,57 +51,11 @@ class ImageViewActivity : AppCompatActivity() {
             // show the loading indicator
             loading_image.visibility = View.VISIBLE
 
+            // loads up the image
+            loadFullsizedImage()
+
             // create the observables
             createObservations()
-
-            // callback for image processing completion
-            val imageCB = {
-                imageIsLoaded = true
-                if (imageIsChecked)
-                    loading_image.visibility = View.GONE
-            }
-
-            val bm = image.getImage()
-
-            // first try to load the cached image from disk
-            bm?.let { bitmap ->
-                full_image.setImageBitmap(bitmap)
-                imageCB()
-            } ?: run {
-                // load the iamge using glide
-                Glide.with(this)
-                    .asBitmap()
-                    .load(image.getLargeImage())
-                    .centerInside()
-                    .listener(object : RequestListener<Bitmap> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Bitmap>?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            Log.d("Glide", "message: ${e?.message}")
-                            imageCB()
-                            showMessage("Oh no!", "An error occurred while loading this image.")
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Bitmap?,
-                            model: Any?,
-                            target: Target<Bitmap>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            image.storeImage(applicationContext, resource)
-                            imageCB()
-                            return false
-                        }
-                    })
-                    .into(full_image)
-            }
-
-            // image.setImageBytes(bitmap)
 
             // enable the home button in the action bar and set the title
             supportActionBar?.let {
@@ -121,6 +72,57 @@ class ImageViewActivity : AppCompatActivity() {
             // something bad happened. abandon
             Log.d("ImageViewActivity", "message: ${tx.message}")
             finish()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        imageViewModel?.cancelRequest()
+    }
+
+    /**
+     * Loads the full size image into the UI
+     */
+    private fun loadFullsizedImage() {
+        // callback for image processing completion
+        val imageCB = {
+            imageIsLoaded = true
+            if (imageIsChecked)
+                loading_image.visibility = View.GONE
+        }
+
+        val bm = image.getImage()
+
+        // first try to load the cached image from disk
+        bm?.let { bitmap ->
+            full_image.setImageBitmap(bitmap)
+            imageCB()
+        } ?: run {
+            // load the iamge using glide
+            Glide.with(this)
+                .asBitmap()
+                .load(image.getLargeImage())
+                .centerInside()
+                .listener(object : RequestListener<Bitmap> {
+                    override fun onLoadFailed( e: GlideException?, model: Any?, target: Target<Bitmap>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        Log.d("Glide", "message: ${e?.message}")
+                        imageCB()
+                        showMessage("Oh no!", "An error occurred while loading this image.")
+                        return false
+                    }
+
+                    override fun onResourceReady( resource: Bitmap?, model: Any?, target: Target<Bitmap>?,
+                        dataSource: DataSource?, isFirstResource: Boolean
+                    ): Boolean {
+                        imgBitmap = resource // save the loaded bitmap so we have quick access to it
+                        imageCB()
+                        return false
+                    }
+                })
+                .into(full_image)
         }
     }
 
@@ -174,7 +176,11 @@ class ImageViewActivity : AppCompatActivity() {
 
         when (isFavorited) {
             true -> imageViewModel.unfavoriteImage(image)
-            else -> imageViewModel.favoriteImage(image)
+            else -> {
+                // we need to store the image locally so we have path data to save into the db
+                imgBitmap?.let { image.storeImage(applicationContext, it) }
+                imageViewModel.favoriteImage(image)
+            }
         }
     }
 

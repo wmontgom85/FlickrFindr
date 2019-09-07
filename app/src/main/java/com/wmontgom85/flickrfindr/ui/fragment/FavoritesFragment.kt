@@ -97,6 +97,16 @@ class FavoritesFragment : Fragment() {
         listener = null
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // cancel the coroutine scope
+        favViewModel.cancelRequest()
+    }
+
+    /**
+     * Reloads the images RecyclerView
+     */
     fun reloadImages() {
         favViewModel.getImages()
     }
