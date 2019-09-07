@@ -23,9 +23,6 @@ public interface FlickrImageDao {
     @Delete
     fun delete(image: FlickrImage)
 
-    @Update
-    fun update(image: FlickrImage) : Int
-
     @Query("DELETE FROM FlickrImage")
     fun deleteAll()
 }

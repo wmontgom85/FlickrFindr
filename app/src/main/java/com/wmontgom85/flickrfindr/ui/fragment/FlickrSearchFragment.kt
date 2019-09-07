@@ -46,7 +46,7 @@ import kotlinx.coroutines.MainScope
 class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     val FAVORITED_IMAGE_RESULT = 100
 
-    private var listener: FlickrSearchFragment.OnFragmentInteractionListener? = null
+    private var listener: OnFragmentInteractionListener? = null
 
     private lateinit var flickrSearchViewModel: FlickrSearchViewModel
 
