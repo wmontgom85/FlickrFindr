@@ -88,6 +88,12 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
             refreshList(it)
         })
 
+        // observe errors
+        flickrSearchViewModel.errorHandler.observe(this, Observer {
+            loading.visibility = View.GONE
+            activity?.showMessage("Whoops!", it)
+        })
+
         // listen to search query changes
         val onTextChange: (String) -> Unit = debounce(750L, MainScope(), this::performSearch)
         searchInput.addTextChangedListener(object : TextWatcher {

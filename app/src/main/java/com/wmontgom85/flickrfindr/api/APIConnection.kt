@@ -30,12 +30,12 @@ class APIConnection(
             connection.apply {
                 connectTimeout = request.timeout
                 readTimeout = request.timeout
-                requestMethod = request.requestType
+                requestMethod = request.requestType.value
                 doInput = true
-                doOutput = request.requestType == "POST" // set connection output boolean based on request type
+                doOutput = request.requestType == RequestType.POST // set connection output boolean based on request type
                 setRequestProperty("charset", "utf-8")
 
-                if (request.requestType == "POST") { // if we're posting data, we need to build the query string
+                if (request.requestType == RequestType.POST) { // if we're posting data, we need to build the query string
                     // send POST data only if query string was successfully generated
                     request.buildQuery()?.let {
                         val os = outputStream
@@ -56,13 +56,13 @@ class APIConnection(
                     }
                     Result.Success(response)
                 }
-                else -> Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP001"))
+                else -> Result.Error(IOException("${errorMessage?:"An error has occurred."} Error Code ACP001"))
             }
         } catch (tx: Throwable) {
             tx.printStackTrace()
 
             // set the connection to null so no further execution can occur
-            return Result.Error(IOException("${errorMessage?:"An error has occurred."}. Error Code ACP002"))
+            return Result.Error(IOException("${errorMessage?:"An error has occurred."} Error Code ACP002"))
         } finally {
             connection?.disconnect()
         }

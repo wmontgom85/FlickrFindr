@@ -8,7 +8,7 @@ import android.net.Uri
 class APIRequest {
     val restUrl : String by lazy { "https://api.flickr.com/services/rest/" }
 
-    var requestType : String = "GET"
+    var requestType : RequestType = RequestType.GET
 
     var params : HashMap<String, String>? = null
 

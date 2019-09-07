@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.wmontgom85.flickrfindr.BuildConfig
 import com.wmontgom85.flickrfindr.api.APIHandler
 import com.wmontgom85.flickrfindr.api.APIRequest
+import com.wmontgom85.flickrfindr.api.RequestType
 import com.wmontgom85.flickrfindr.api.jsonadapter.FlickrJsonAdapter
 import com.wmontgom85.flickrfindr.api.response.ImageSearchResponse
 import com.wmontgom85.flickrfindr.sealed.Result
@@ -32,7 +33,7 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
                 ///launch the job
                 job = launch {
                     val request = APIRequest().apply {
-                        requestType = "POST"
+                        requestType = RequestType.POST
                         params = hashMapOf(
                             "api_key" to BuildConfig.FlickrApiKey,
                             "method" to "flickr.photos.search",
