@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import android.content.ContextWrapper
+import com.wmontgom85.flickrfindr.supp.centercrop
 import com.wmontgom85.flickrfindr.supp.px
 import java.io.*
 
@@ -104,42 +105,6 @@ data class FlickrImage (
      */
     fun getThumbnailFromLarge() : Bitmap? {
         val bm = getImage()
-
-        // convert to px from dp
-        val imgDimen = 150.px()
-
-        return bm?.let {
-            if (it.width > imgDimen || it.height > imgDimen) {
-                var newW = imgDimen
-                var newH = imgDimen
-                var newX = 0
-                var newY = 0
-
-                // thumbnail should be sized according to original dimensions and centercropped
-                when {
-                    (it.width > it.height) -> {
-                        newW = ((it.width.toDouble() / it.height.toDouble()) * imgDimen).toInt()
-                        newX = (newW - newH) / 2
-                    }
-                    else -> {
-                        newH = ((it.height.toDouble() / it.width.toDouble()) * imgDimen).toInt()
-                        newY = (newH - newW) / 2
-                    }
-                }
-
-                // don't waste time scaling if the image is already square
-                val scaledBM = when {
-                    newW != newH -> Bitmap.createScaledBitmap(bm, newW, newH, false)
-                    else -> bm
-                }
-
-                Bitmap.createBitmap(scaledBM, newX, newY, imgDimen, imgDimen)
-            } else {
-                // the image is already smaller than 225 (the thumbnail size)
-                bm
-            }
-        } ?: run {
-            null
-        }
+        return bm?.centercrop(150.px())
     }
 }

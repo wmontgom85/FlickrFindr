@@ -7,8 +7,14 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_image_view"
-        tools:context=".ui.activity.ImageViewActivity"
-        android:background="@drawable/gradient_trans_blue">
+        tools:context=".ui.activity.ImageViewActivity">
+
+    <ImageView android:id="@+id/background_image"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:scaleType="fitXY"
+               android:adjustViewBounds="true"
+               android:alpha="0.4"/>
 
     <ImageView android:id="@+id/full_image"
                android:layout_width="match_parent"

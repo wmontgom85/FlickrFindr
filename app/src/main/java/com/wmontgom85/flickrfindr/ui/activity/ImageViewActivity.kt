@@ -26,6 +26,9 @@ import com.wmontgom85.flickrfindr.viewmodel.FlickrImageViewModel
 import kotlinx.android.synthetic.main.activity_image_view.*
 import kotlinx.android.synthetic.main.content_image_view.*
 import kotlinx.coroutines.MainScope
+import android.graphics.Point
+import com.wmontgom85.flickrfindr.supp.blurTo
+
 
 class ImageViewActivity : AppCompatActivity() {
     private lateinit var image : FlickrImage
@@ -82,6 +85,14 @@ class ImageViewActivity : AppCompatActivity() {
     }
 
     /**
+     * Sets the image as a blurred background
+     */
+    private fun setBackground(bm: Bitmap?) {
+        // set the image as a blurred background
+        background_image.setImageBitmap(bm?.blurTo(5))
+    }
+
+    /**
      * Loads the full size image into the UI
      */
     private fun loadFullsizedImage() {
@@ -97,6 +108,7 @@ class ImageViewActivity : AppCompatActivity() {
         // first try to load the cached image from disk
         bm?.let { bitmap ->
             full_image.setImageBitmap(bitmap)
+            setBackground(bitmap)
             imageCB()
         } ?: run {
             // load the iamge using glide
@@ -118,6 +130,7 @@ class ImageViewActivity : AppCompatActivity() {
                         dataSource: DataSource?, isFirstResource: Boolean
                     ): Boolean {
                         imgBitmap = resource // save the loaded bitmap so we have quick access to it
+                        setBackground(imgBitmap)
                         imageCB()
                         return false
                     }
