@@ -6,13 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.appcompat.widget.SearchView
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,10 +33,7 @@ import com.google.android.flexbox.JustifyContent
 import com.wmontgom85.flickrfindr.R
 import com.wmontgom85.flickrfindr.api.response.ImageSearchResponse
 import com.wmontgom85.flickrfindr.repo.model.FlickrImage
-import com.wmontgom85.flickrfindr.supp.debounce
-import com.wmontgom85.flickrfindr.supp.inflate
-import com.wmontgom85.flickrfindr.supp.showMessage
-import com.wmontgom85.flickrfindr.supp.throttleFirst
+import com.wmontgom85.flickrfindr.supp.*
 import com.wmontgom85.flickrfindr.ui.activity.ImageViewActivity
 import com.wmontgom85.flickrfindr.viewmodel.FlickrSearchViewModel
 import kotlinx.android.synthetic.main.fragment_flickr_search.*
@@ -83,17 +85,13 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
         })
 
         // listen to search query changes
-        val onTextChange: (String) -> Unit = debounce(500L, MainScope(), this::performSearch)
-        root.search_input.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextChange(newText: String): Boolean {
-                loading.visibility = View.VISIBLE
-
-                // allow empty strings to go through so we can cancel any previous requests
-                onTextChange(newText)
-                return true
+        val onTextChange: (String) -> Unit = throttleLatest(500L, MainScope(), this::performSearch)
+        root.search_input.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                onTextChange(s.toString())
             }
-
-            override fun onQueryTextSubmit(query: String): Boolean = true
         })
 
         // per page listener
@@ -150,7 +148,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private fun nextPage(v : View) {
         loading.visibility = View.VISIBLE
         ++currentPage
-        search(search_input.query.toString())
+        search(search_input.text.toString())
     }
 
     /**
@@ -159,7 +157,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private fun prevPage(v : View) {
         loading.visibility = View.VISIBLE
         --currentPage
-        search(search_input.query.toString())
+        search(search_input.text.toString())
     }
 
     /**
@@ -178,8 +176,8 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
             itemsPerPage = newPerPage
             per_page.text = "$newPerPage"
 
-            if (search_input.query.isNotBlank()) {
-                performSearch(search_input.query.toString())
+            if (search_input.text.isNotBlank()) {
+                performSearch(search_input.text.toString())
             }
         }
     }
@@ -234,7 +232,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
             pagination.visibility = View.GONE
         }
 
-        loading.visibility = View.GONE
+        loading.visibility = View.INVISIBLE
         adapter.notifyDataSetChanged()
     }
 
@@ -315,7 +313,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
                     target: Target<Drawable>?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    loading.visibility = View.GONE
+                    loading.visibility = View.INVISIBLE
 
                     activity?.showMessage("Whoops!", "The image failed to load. Please try again")
                     return false
@@ -335,7 +333,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
                         "image_to_full_transition")
                     startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
 
-                    loading.visibility = View.GONE
+                    loading.visibility = View.INVISIBLE
 
                     return true
                 }

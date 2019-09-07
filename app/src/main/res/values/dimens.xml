@@ -15,5 +15,5 @@
 
     <!-- text sizes -->
     <dimen name="text_label">16sp</dimen>
-    <dimen name="name_label">16sp</dimen>
+    <dimen name="name_label">14sp</dimen>
 </resources>

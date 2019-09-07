@@ -3,19 +3,15 @@ package com.wmontgom85.flickrfindr.ui.activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.tabs.TabLayout
-import com.wmontgom85.flickrfindr.BuildConfig
 import com.wmontgom85.flickrfindr.R
-import com.wmontgom85.flickrfindr.api.APIRequest
 import com.wmontgom85.flickrfindr.supp.hideKeyboard
 import com.wmontgom85.flickrfindr.ui.fragment.FavoritesFragment
 import com.wmontgom85.flickrfindr.ui.fragment.FlickrSearchFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity(),
@@ -51,7 +47,6 @@ class MainActivity : AppCompatActivity(),
             }
         })
 
-        val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
     }
 

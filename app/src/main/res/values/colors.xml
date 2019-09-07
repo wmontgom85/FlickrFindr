@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#055dd8</color>
-    <color name="colorPrimaryDark">#fb0580</color>
+    <!-- flickr blue = #055dd8 -->
+    <!-- flickr pink = #fb0580 -->
+
+    <color name="colorPrimary">#99000000</color>
+    <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#000000</color>
     <color name="white">#ffffff</color>
 
     <color name="black_overlay">#66000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_75">#BF000000</color>
+
 </resources>

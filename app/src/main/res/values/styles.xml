@@ -27,4 +27,11 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <style name="FadingScrollView">
+        <item name="android:fadingEdge">horizontal</item>
+        <item name="android:fadingEdgeLength">@dimen/deep_margin</item>
+        <item name="android:fillViewport">false</item>
+        <item name="android:requiresFadingEdge">vertical</item>
+    </style>
+
 </resources>

@@ -7,28 +7,23 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".ui.fragment.FlickrSearchFragment"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:background="@color/black_75">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_margin="@dimen/shallow_margin"
-        android:imeOptions="actionSearch|flagNoExtractUi|flagNoFullscreen"
-        android:layout_alignParentTop="true"
-        app:queryHint="Search Images"
-        app:iconifiedByDefault="false" />
-
-    <ProgressBar
-            style="@android:style/Widget.Holo.ProgressBar.Horizontal"
-            android:id="@+id/loading"
+    <EditText
+            android:id="@+id/search_input"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/spaced_margin"
-            android:visibility="invisible"
-            android:indeterminate="true"
-            android:layout_below="@id/search_input"/>
+            android:layout_height="wrap_content"
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:layout_alignParentTop="true"
+            android:imeOptions="actionDone"
+            android:background="@color/black_75"
+            android:textColor="@color/white"
+            android:paddingTop="@dimen/spaced_margin"
+            android:paddingBottom="@dimen/spaced_margin"
+            android:drawablePadding="@dimen/spaced_margin"
+            android:paddingStart="@dimen/spaced_margin"
+            android:paddingEnd="@dimen/spaced_margin"/>
 
     <LinearLayout android:id="@+id/result_count_row"
                   android:layout_width="match_parent"
@@ -36,10 +31,11 @@
                   android:orientation="horizontal"
                   android:paddingStart="@dimen/deep_margin"
                   android:paddingEnd="@dimen/deep_margin"
-                  android:layout_marginTop="@dimen/shallow_margin"
+                  android:paddingTop="@dimen/deep_margin"
+                  android:paddingBottom="@dimen/shallow_margin"
                   android:weightSum="2"
                   android:gravity="center_vertical"
-                  android:layout_below="@id/loading">
+                  android:layout_below="@id/search_input">
 
         <TextView android:id="@+id/image_total"
                   android:layout_width="0dp"
@@ -48,6 +44,7 @@
                   android:textAlignment="textStart"
                   android:text="@string/empty_results"
                   android:textSize="@dimen/text_label"
+                  android:textColor="@color/white"
                   android:visibility="invisible"/>
 
         <LinearLayout android:layout_width="0dp"
@@ -60,6 +57,7 @@
                       android:layout_height="wrap_content"
                       android:text="25"
                       android:textSize="@dimen/text_label"
+                      android:textColor="@color/black_75"
                       android:paddingStart="7dp"
                       android:paddingEnd="7dp"
                       android:paddingTop="3dp"
@@ -71,6 +69,7 @@
                   android:layout_height="wrap_content"
                   android:textAlignment="textEnd"
                   android:text="@string/per_page"
+                  android:textColor="@color/white"
                   android:layout_marginStart="@dimen/shallow_margin"
                   android:textSize="@dimen/text_label"/>
 
@@ -78,14 +77,24 @@
 
     </LinearLayout>
 
+    <ProgressBar
+            style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/spaced_margin"
+            android:visibility="invisible"
+            android:indeterminate="true"
+            android:layout_below="@id/result_count_row"
+            android:indeterminateTint="@color/white"/>
+
     <androidx.recyclerview.widget.RecyclerView
+            android:theme="@style/FadingScrollView"
             android:id="@+id/images_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
+            android:background="@drawable/gradient_black50_white"
             android:clipToPadding="false"
-            android:layout_marginTop="@dimen/spaced_margin"
-            android:layout_below="@id/result_count_row"
+            android:layout_below="@id/loading"
             android:layout_above="@id/pagination"/>
 
     <LinearLayout
@@ -96,7 +105,8 @@
             android:weightSum="3"
             android:layout_alignParentBottom="true"
             android:padding="@dimen/spaced_margin"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:background="@color/white">
 
         <TextView android:id="@+id/prev_page"
                   android:layout_width="0dp"
