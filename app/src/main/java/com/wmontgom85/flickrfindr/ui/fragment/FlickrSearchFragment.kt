@@ -11,13 +11,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.NumberPicker
-import android.widget.TextView
-import androidx.appcompat.widget.SearchView
-import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -52,11 +46,17 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private lateinit var flickrSearchViewModel: FlickrSearchViewModel
 
     private lateinit var adapter : SearchImageAdapter
+    private lateinit var suggestAdapter : ArrayAdapter<String>
 
     private lateinit var imageList : RecyclerView
+    private lateinit var searchInput : AutoCompleteTextView
 
+    private lateinit var suggestions : HashSet<String>
+
+    // the list of images from search
     private var images : List<FlickrImage>? = null
 
+    // pagination controls
     private var itemsPerPage = 25
     private var currentPage = 1
 
@@ -69,15 +69,19 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
         val root = inflater.inflate(R.layout.fragment_flickr_search, container, false)
 
         imageList = root.images_list
+        searchInput = root.search_input
 
         val layoutManager = FlexboxLayoutManager(activity)
         layoutManager.flexDirection = FlexDirection.ROW
         layoutManager.justifyContent = JustifyContent.SPACE_AROUND
         imageList.layoutManager = layoutManager
 
-        // create the adapter
+        // create the image adapter
         adapter = SearchImageAdapter()
         imageList.adapter = adapter
+
+        // build search suggestions
+        buildSearchSuggestions()
 
         // create the live data observer
         flickrSearchViewModel.flickrImagesLiveData.observe(this, Observer {
@@ -85,11 +89,12 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
         })
 
         // listen to search query changes
-        val onTextChange: (String) -> Unit = throttleLatest(500L, MainScope(), this::performSearch)
-        root.search_input.addTextChangedListener(object : TextWatcher {
+        val onTextChange: (String) -> Unit = debounce(750L, MainScope(), this::performSearch)
+        searchInput.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // throttle the search submission
                 onTextChange(s.toString())
             }
         })
@@ -132,6 +137,42 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     }
 
     /**
+     * Builds the search suggestion set
+     */
+    private fun buildSearchSuggestions() {
+        val preferences = activity?.getSharedPreferences("search_suggestions", Context.MODE_PRIVATE)
+        suggestions = preferences?.getStringSet("suggestions", HashSet<String>()) as HashSet
+        updateSuggestionAdapter()
+    }
+
+    /**
+     * Resets the search suggestion adaptoins
+     */
+    private fun updateSuggestionAdapter() {
+        suggestAdapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, suggestions.toList())
+    }
+
+    /**
+     * Stored search history in shared prefs
+     */
+    private fun storeSuggestion(suggestion: String) {
+        // make sure it's not already in the suggestion list
+        if (!suggestions.contains(suggestion)) {
+            suggestions.add(suggestion)
+            if (suggestions.size > 20) {
+                // @TODO trim list
+            }
+            val preferences = activity?.getSharedPreferences("search_suggestions", Context.MODE_PRIVATE)
+            preferences?.edit()?.let {
+                it.putStringSet("suggestions", suggestions)
+                it.commit()
+            }
+
+            updateSuggestionAdapter()
+        }
+    }
+
+    /**
      * Updates the per page count
      */
     private fun changePerPage(v : View) {
@@ -148,7 +189,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private fun nextPage(v : View) {
         loading.visibility = View.VISIBLE
         ++currentPage
-        search(search_input.text.toString())
+        search(searchInput.text.toString())
     }
 
     /**
@@ -157,7 +198,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private fun prevPage(v : View) {
         loading.visibility = View.VISIBLE
         --currentPage
-        search(search_input.text.toString())
+        search(searchInput.text.toString())
     }
 
     /**
@@ -176,8 +217,8 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
             itemsPerPage = newPerPage
             per_page.text = "$newPerPage"
 
-            if (search_input.text.isNotBlank()) {
-                performSearch(search_input.text.toString())
+            if (searchInput.text.isNotBlank()) {
+                performSearch(searchInput.text.toString())
             }
         }
     }
@@ -187,7 +228,14 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
      */
     private fun performSearch(term: String) {
         loading.visibility = View.VISIBLE
+
+        // user triggered a new search. reset the page number.
         currentPage = 1
+
+        // save the term as a future suggestion
+        if (term.isNotBlank()) storeSuggestion(term)
+
+        // call search
         search(term)
     }
 
