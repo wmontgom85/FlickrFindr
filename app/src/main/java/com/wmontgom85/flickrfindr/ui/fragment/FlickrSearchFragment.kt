@@ -214,13 +214,13 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
             when {
                 it.pages > 0 -> {
-                    when (it.page > 0) {
+                    when (it.page > 1) {
                         true -> prev_page.visibility = View.VISIBLE
-                        else -> prev_page.visibility = View.GONE
+                        else -> prev_page.visibility = View.INVISIBLE
                     }
                     when (it.page < it.pages) {
                         true -> next_page.visibility = View.VISIBLE
-                        else -> next_page.visibility = View.GONE
+                        else -> next_page.visibility = View.INVISIBLE
                     }
                     page_num.text = "Page ${it.page} of ${it.pages}"
                     pagination.visibility = View.VISIBLE
