@@ -15,4 +15,7 @@
 
     <string name="prev_page">&lt; Prev</string>
     <string name="next_page">Next &gt; </string>
+
+    <string name="empty_favorites">You have not favorited any images.\nImages you favorite will appear here.</string>
+    <string name="empty_search">Tap the search bar above to begin your search.\n</string>
 </resources>

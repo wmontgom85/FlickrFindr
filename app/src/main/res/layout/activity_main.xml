@@ -10,7 +10,8 @@
     <com.google.android.material.appbar.AppBarLayout
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:background="@android:color/black">
 
         <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"

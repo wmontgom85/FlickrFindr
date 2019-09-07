@@ -25,6 +25,7 @@ import com.wmontgom85.flickrfindr.supp.inflate
 import com.wmontgom85.flickrfindr.supp.throttleFirst
 import com.wmontgom85.flickrfindr.ui.activity.ImageViewActivity
 import com.wmontgom85.flickrfindr.viewmodel.FavoritesViewModel
+import kotlinx.android.synthetic.main.fragment_favorites.*
 import kotlinx.android.synthetic.main.fragment_favorites.view.*
 import kotlinx.coroutines.MainScope
 
@@ -115,6 +116,10 @@ class FavoritesFragment : Fragment() {
      * Refreshes the images list with the new data
      */
     private fun refreshList() {
+        when (favImages?.isNotEmpty()) {
+            true -> empty_favorites.visibility = View.GONE
+            else -> empty_favorites.visibility = View.VISIBLE
+        }
         adapter.notifyDataSetChanged()
     }
 

@@ -27,6 +27,7 @@
             android:singleLine="true"
             android:imeOptions="actionDone"
             android:hint="@string/search_hint"
+            android:textColorHint="@color/white"
             android:completionThreshold="0"/>
 
     <LinearLayout android:id="@+id/result_count_row"
