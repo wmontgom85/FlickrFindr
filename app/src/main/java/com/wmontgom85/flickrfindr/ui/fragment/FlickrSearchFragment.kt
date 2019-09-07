@@ -150,17 +150,21 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
      */
     private fun updateSuggestionAdapter() {
         suggestAdapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, suggestions.toList())
+        searchInput.setAdapter(suggestAdapter)
     }
 
     /**
      * Stored search history in shared prefs
      */
     private fun storeSuggestion(suggestion: String) {
+        if (suggestion.isBlank()) return
+
         // make sure it's not already in the suggestion list
         if (!suggestions.contains(suggestion)) {
             suggestions.add(suggestion)
             if (suggestions.size > 20) {
-                // @TODO trim list
+                // remove the last entry
+                suggestions.remove(suggestions.last())
             }
             val preferences = activity?.getSharedPreferences("search_suggestions", Context.MODE_PRIVATE)
             preferences?.edit()?.let {
@@ -232,9 +236,6 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
         // user triggered a new search. reset the page number.
         currentPage = 1
 
-        // save the term as a future suggestion
-        if (term.isNotBlank()) storeSuggestion(term)
-
         // call search
         search(term)
     }
@@ -273,6 +274,9 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
                 }
                 else -> pagination.visibility = View.GONE
             }
+
+            // save the term as a future suggestion
+            storeSuggestion(searchInput.text.toString())
         } ?: run {
             images = null
             image_total.text = "0 results"
