@@ -23,7 +23,7 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
     val errorHandler = MutableLiveData<String>()
 
     @Suppress("UNCHECKED_CAST")
-    fun performSearch(term : String, perPage: Int = 25) {
+    fun performSearch(term : String, perPage: Int = 25, currentPage: Int = 1) {
         // cancel any previous requests so we don't stack up request processing
         job?.cancel()
 
@@ -39,6 +39,7 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
                             "text" to term,
                             "format" to "json",
                             "per_page" to "$perPage",
+                            "page" to "$currentPage",
                             "nojsoncallback" to "1"
                         )
                     }

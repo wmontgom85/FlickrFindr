@@ -2,10 +2,12 @@ package com.wmontgom85.flickrfindr.supp
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 
 fun ViewGroup.inflate(@LayoutRes layoutRes: Int, attachToRoot: Boolean = false): View {
@@ -26,4 +28,9 @@ fun Activity.showMessage(title: String, message: String) {
     val dialog: AlertDialog = builder.create()
 
     dialog.show()
+}
+
+fun View.hideKeyboard() {
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(windowToken, 0)
 }

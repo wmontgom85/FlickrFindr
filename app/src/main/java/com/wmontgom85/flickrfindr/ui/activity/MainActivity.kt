@@ -3,6 +3,8 @@ package com.wmontgom85.flickrfindr.ui.activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
@@ -11,6 +13,7 @@ import com.google.android.material.tabs.TabLayout
 import com.wmontgom85.flickrfindr.BuildConfig
 import com.wmontgom85.flickrfindr.R
 import com.wmontgom85.flickrfindr.api.APIRequest
+import com.wmontgom85.flickrfindr.supp.hideKeyboard
 import com.wmontgom85.flickrfindr.ui.fragment.FavoritesFragment
 import com.wmontgom85.flickrfindr.ui.fragment.FlickrSearchFragment
 
@@ -31,23 +34,28 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
 
         sectionsPagerAdapter = SectionsPagerAdapter(this, supportFragmentManager)
+
         val viewPager: ViewPager = findViewById(R.id.view_pager)
         viewPager.adapter = sectionsPagerAdapter
+        viewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+                viewPager.hideKeyboard()
+            }
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                viewPager.hideKeyboard()
+            }
+
+            override fun onPageSelected(position: Int) {
+                viewPager.hideKeyboard()
+            }
+        })
 
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
-
-        val request = APIRequest().apply {
-            requestType = "POST"
-            params = hashMapOf(
-                "api_key" to BuildConfig.FlickrApiKey,
-                "method" to "flickr.photos.search",
-                "format" to "json"
-            )
-        }
-
-        println(request.buildQuery())
     }
+
+
 
     /**
      * Users to signal a reload needs to occur with the favorites fragment

@@ -115,7 +115,7 @@ class FavoritesFragment : Fragment() {
      * activity.
      */
     interface OnFragmentInteractionListener {
-        // @TODO put future communication methods here
+        // @TODO put any future communication methods here
     }
 
     companion object {

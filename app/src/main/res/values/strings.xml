@@ -12,4 +12,7 @@
 
     <string name="empty_results">0 results</string>
     <string name="per_page">per page</string>
+
+    <string name="prev_page">&lt; Prev</string>
+    <string name="next_page">Next &gt; </string>
 </resources>

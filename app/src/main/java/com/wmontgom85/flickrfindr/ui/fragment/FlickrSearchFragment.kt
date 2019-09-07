@@ -37,8 +37,7 @@ import com.wmontgom85.flickrfindr.viewmodel.FlickrSearchViewModel
 import kotlinx.android.synthetic.main.fragment_flickr_search.*
 import kotlinx.android.synthetic.main.fragment_flickr_search.view.*
 import kotlinx.coroutines.MainScope
-
-
+import java.text.DecimalFormat
 
 /**
  * A placeholder fragment containing a simple view.
@@ -57,6 +56,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     private var images : List<FlickrImage>? = null
 
     private var itemsPerPage = 25
+    private var currentPage = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,8 +97,16 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
         })
 
         // per page listener
-        val onPerPageSelected: (View) -> Unit = debounce(500L, MainScope(), this::changePerPage)
+        val onPerPageSelected: (View) -> Unit = throttleFirst(500L, MainScope(), this::changePerPage)
         root.per_page.setOnClickListener(onPerPageSelected)
+
+        // next page listener
+        val nextPageSelected: (View) -> Unit = throttleFirst(500L, MainScope(), this::nextPage)
+        root.next_page.setOnClickListener(nextPageSelected)
+
+        // per page listener
+        val prevPageSelected: (View) -> Unit = throttleFirst(500L, MainScope(), this::prevPage)
+        root.prev_page.setOnClickListener(prevPageSelected)
 
         return root
     }
@@ -128,12 +136,30 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
     /**
      * Updates the per page count
      */
-    private fun changePerPage(v: View) {
+    private fun changePerPage(v : View) {
         activity?.let {
             val numberPicker = NumberPickerDialog()
             numberPicker.valueChangeListener = this
             numberPicker.show(it.supportFragmentManager, "per_page_picker")
         }
+    }
+
+    /**
+     * Sends the user to the next page
+     */
+    private fun nextPage(v : View) {
+        loading.visibility = View.VISIBLE
+        ++currentPage
+        search(search_input.query.toString())
+    }
+
+    /**
+     * Sends the user to the previous page
+     */
+    private fun prevPage(v : View) {
+        loading.visibility = View.VISIBLE
+        --currentPage
+        search(search_input.query.toString())
     }
 
     /**
@@ -162,7 +188,13 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
      * Fire off the image search
      */
     private fun performSearch(term: String) {
-        flickrSearchViewModel.performSearch(term, itemsPerPage)
+        loading.visibility = View.VISIBLE
+        currentPage = 1
+        search(term)
+    }
+
+    private fun search(term: String) {
+        flickrSearchViewModel.performSearch(term, itemsPerPage, currentPage)
     }
 
     /**
@@ -173,13 +205,33 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
             images = it.photos // set the images list to the response images
             image_total.text = when (it.total) {
                 1L -> "1 result"
-                else -> "${it.total} results"
+                else -> {
+                    val formatter = DecimalFormat("#,###,###");
+                    "${formatter.format(it.total)} results"
+                }
             }
             image_total.visibility = View.VISIBLE
+
+            when {
+                it.pages > 0 -> {
+                    when (it.page > 0) {
+                        true -> prev_page.visibility = View.VISIBLE
+                        else -> prev_page.visibility = View.GONE
+                    }
+                    when (it.page < it.pages) {
+                        true -> next_page.visibility = View.VISIBLE
+                        else -> next_page.visibility = View.GONE
+                    }
+                    page_num.text = "Page ${it.page} of ${it.pages}"
+                    pagination.visibility = View.VISIBLE
+                }
+                else -> pagination.visibility = View.GONE
+            }
         } ?: run {
             images = null
             image_total.text = "0 results"
             image_total.visibility = View.INVISIBLE
+            pagination.visibility = View.GONE
         }
 
         loading.visibility = View.GONE
@@ -227,7 +279,7 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
                 holder.image = it
 
                 // create launch function for click action
-                val cb = fun(v: View) {
+                val cb = fun(_ : View) {
                     if (loading.visibility == View.VISIBLE) {
                         // we're loading an image already. halt execution
                         return
@@ -235,49 +287,59 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
                     loading.visibility = View.VISIBLE
 
-                    // attempt preload of large image for quicker rendering
-                    Glide.with(holder.imageview)
-                        .load(holder.image?.getLargeImage())
-                        .listener(object : RequestListener<Drawable> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                loading.visibility = View.GONE
-
-                                activity?.showMessage("Whoops!", "The image failed to load. Please try again")
-                                return false
-                            }
-
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                // image is now preloaded and cached through Glide. send user to activity
-                                val i = Intent(activity, ImageViewActivity::class.java)
-                                i.putExtra("image", holder.image)
-                                val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
-                                    "image_to_full_transition")
-                                startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
-
-                                loading.visibility = View.GONE
-
-                                return true
-                            }
-                        }).preload()
+                    // attempt image preload
+                    preloadThroughGlide(holder)
                 }
 
-                val menuAction: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)
-                holder.imageview.setOnClickListener(menuAction) // bind click action to avatar
+                // throttle card clicks
+                val cardClick: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)
+                holder.itemView.setOnClickListener(cardClick) // bind click action to avatar
 
                 holder.populate()
             }
         }
+    }
+
+    /**
+     * Attempts to preload an image through Glide so that it can be displayed more quickly when tapping
+     * an image card
+     */
+    private fun preloadThroughGlide(holder: SearchImageViewHolder) {
+        // attempt preload of large image for quicker rendering
+        Glide.with(holder.imageview)
+            .load(holder.image?.getLargeImage())
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    loading.visibility = View.GONE
+
+                    activity?.showMessage("Whoops!", "The image failed to load. Please try again")
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    // image is now preloaded and cached through Glide. send user to activity
+                    val i = Intent(activity, ImageViewActivity::class.java)
+                    i.putExtra("image", holder.image)
+                    val options = ActivityOptions.makeSceneTransitionAnimation(activity, holder.imageview,
+                        "image_to_full_transition")
+                    startActivityForResult(i, FAVORITED_IMAGE_RESULT, options.toBundle())
+
+                    loading.visibility = View.GONE
+
+                    return true
+                }
+            }).preload()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
