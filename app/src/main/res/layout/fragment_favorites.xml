@@ -3,7 +3,8 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              tools:context=".ui.fragment.FavoritesFragment"
-             android:background="@color/black_75">
+             android:background="@color/black_75"
+             android:animateLayoutChanges="true">
 
     <TextView android:id="@+id/empty_favorites"
               android:layout_width="wrap_content"

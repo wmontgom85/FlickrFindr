@@ -31,6 +31,7 @@ import com.wmontgom85.flickrfindr.supp.blurTo
 
 class ImageViewActivity : AppCompatActivity() {
     private lateinit var image : FlickrImage
+    private var imagePosition = -1
 
     private var imageIsChecked = false
     private var imageIsLoaded = false
@@ -49,6 +50,7 @@ class ImageViewActivity : AppCompatActivity() {
 
         try {
             image = intent.getSerializableExtra("image") as FlickrImage
+            imagePosition = intent.getIntExtra("imagePosition", -1)
 
             // show the loading indicator
             loading_image.visibility = View.VISIBLE
@@ -225,6 +227,8 @@ class ImageViewActivity : AppCompatActivity() {
         if (favoriteStatusChanged) {
             val data = Intent()
             data.putExtra("status_changed", true)
+            data.putExtra("imageId", image.id)
+            data.putExtra("imagePosition", imagePosition)
             setResult(Activity.RESULT_OK, data)
         }
 

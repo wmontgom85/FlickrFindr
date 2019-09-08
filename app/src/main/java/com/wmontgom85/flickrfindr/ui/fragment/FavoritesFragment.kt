@@ -111,7 +111,19 @@ class FavoritesFragment : Fragment() {
     fun reloadImages() {
         favViewModel.getImages()
     }
-    
+
+    /**
+     * Updates images after unfavoriting so that the autolayout animation can occur
+     */
+    fun updateImages(position : Int, imageId : String?) {
+        println("$position")
+        favImages = favImages?.filter { image -> image.id != imageId }
+        when (position > -1) {
+            true -> adapter.notifyItemRemoved(position)
+            else -> adapter.notifyDataSetChanged()
+        }
+    }
+
     /**
      * Refreshes the images list with the new data
      */
@@ -162,6 +174,7 @@ class FavoritesFragment : Fragment() {
                     val i = Intent(activity, ImageViewActivity::class.java)
 
                     i.putExtra("image", holder.image)
+                    i.putExtra("imagePosition", holder.layoutPosition)
                     val options = ActivityOptions.makeSceneTransitionAnimation(
                         activity, holder.imageview,
                         "image_to_full_transition"
@@ -185,7 +198,7 @@ class FavoritesFragment : Fragment() {
                 if (resultCode == Activity.RESULT_OK) {
                     data?.let {
                         if (it.getBooleanExtra("status_changed", false)) {
-                            reloadImages()
+                            updateImages(it.getIntExtra("imagePosition", -1), it.getStringExtra("imageId"))
                         }
                     }
                 }
