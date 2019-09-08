@@ -1,6 +1,7 @@
 package com.wmontgom85.flickrfindr.viewmodel
 
 import android.app.Application
+import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.wmontgom85.flickrfindr.BuildConfig
@@ -58,11 +59,13 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
     /**
      * Processes the favoriting of an image
      */
-    fun favoriteImage(img : FlickrImage) {
+    fun favoriteImage(img : FlickrImage, bitmap: Bitmap) {
         job?.cancel()
 
         job = launch {
             flickrImageDao?.let { imgDao ->
+                img.storeImage(getApplication(), bitmap)
+
                 // remove from db
                 imgDao.insert(img)
 

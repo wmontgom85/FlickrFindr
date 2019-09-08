@@ -189,8 +189,7 @@ class ImageViewActivity : AppCompatActivity() {
             true -> imageViewModel.unfavoriteImage(image)
             else -> {
                 // we need to store the image locally so we have path data to save into the db
-                imgBitmap?.let { image.storeImage(applicationContext, it) }
-                imageViewModel.favoriteImage(image)
+                imageViewModel.favoriteImage(image, imgBitmap!!)
             }
         }
     }
