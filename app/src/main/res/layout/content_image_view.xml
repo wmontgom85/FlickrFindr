@@ -14,7 +14,9 @@
                android:layout_height="match_parent"
                android:scaleType="fitXY"
                android:adjustViewBounds="true"
-               android:alpha="0.4"/>
+               android:alpha="0.3"
+               android:tint="@android:color/black"
+               android:tintMode="screen"/>
 
     <ImageView android:id="@+id/full_image"
                android:layout_width="match_parent"

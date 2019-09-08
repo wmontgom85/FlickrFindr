@@ -26,7 +26,6 @@ import com.wmontgom85.flickrfindr.viewmodel.FlickrImageViewModel
 import kotlinx.android.synthetic.main.activity_image_view.*
 import kotlinx.android.synthetic.main.content_image_view.*
 import kotlinx.coroutines.MainScope
-import android.graphics.Point
 import com.wmontgom85.flickrfindr.supp.blurTo
 
 

@@ -13,7 +13,8 @@
         <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@android:color/black">
 
             <ImageView
                     android:id="@+id/image_thumb"
@@ -33,6 +34,7 @@
                     android:layout_alignStart="@id/image_thumb"
                     android:layout_alignEnd="@id/image_thumb"
                     android:textAlignment="center"
+                    android:background="@color/white"
                     android:padding="@dimen/shallow_margin"/>
 
         </RelativeLayout>
