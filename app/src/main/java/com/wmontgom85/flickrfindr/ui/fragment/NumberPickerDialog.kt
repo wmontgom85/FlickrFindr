@@ -19,7 +19,7 @@ class NumberPickerDialog : DialogFragment() {
         val alertBuilder = android.app.AlertDialog.Builder(activity)
         alertBuilder.setTitle("Per Page Count")
         alertBuilder.setMessage("Make a selection:")
-        alertBuilder.setPositiveButton("Done") { dialog, _ ->
+        alertBuilder.setPositiveButton("Done") { _, _ ->
             valueChangeListener!!.onValueChange(numberPicker, numberPicker.value, numberPicker.value)
         }
         alertBuilder.setNegativeButton("Cancel") { dialog, _ ->

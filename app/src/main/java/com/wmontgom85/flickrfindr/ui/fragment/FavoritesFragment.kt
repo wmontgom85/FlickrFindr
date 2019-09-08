@@ -158,7 +158,7 @@ class FavoritesFragment : Fragment() {
                 holder.image = it
 
                 // create launch function for click action
-                val cb = fun(v: View) {
+                val cb = fun(_: View) {
                     val i = Intent(activity, ImageViewActivity::class.java)
 
                     i.putExtra("image", holder.image)

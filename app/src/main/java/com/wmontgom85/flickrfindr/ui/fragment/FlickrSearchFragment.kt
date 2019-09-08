@@ -155,8 +155,10 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
      * Resets the search suggestion adaptoins
      */
     private fun updateSuggestionAdapter() {
-        suggestAdapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, suggestions.toList())
-        searchInput.setAdapter(suggestAdapter)
+        context?.let {
+            suggestAdapter = ArrayAdapter(context!!, android.R.layout.simple_list_item_1, suggestions.toList())
+            searchInput.setAdapter(suggestAdapter)
+        }
     }
 
     /**
