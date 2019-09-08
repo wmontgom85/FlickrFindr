@@ -51,6 +51,8 @@ class FavoritesFragment : Fragment() {
 
     private var favImages : List<FlickrImage>? = null
 
+    private var loadRequested = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         favViewModel = ViewModelProvider(this).get(FavoritesViewModel::class.java)
@@ -170,15 +172,23 @@ class FavoritesFragment : Fragment() {
 
                 // create launch function for click action
                 val cb = fun(_: View) {
-                    val i = Intent(activity, ImageViewActivity::class.java)
+                    // if the user taps two cards at once, it could potentially load both, causing
+                    // the transition back to fail and a blank card to be seen checking if
+                    // a load was requeste first before loading the image guarantees we're only
+                    // loading once, even when two cards are tapped
+                    if (!loadRequested) {
+                        loadRequested = true
 
-                    i.putExtra("image", holder.image)
-                    i.putExtra("imagePosition", holder.layoutPosition)
-                    val options = ActivityOptions.makeSceneTransitionAnimation(
-                        activity, holder.imageview,
-                        "image_to_full_transition"
-                    )
-                    startActivityForResult(i, UNFAVORITED_IMAGE_RESULT, options.toBundle())
+                        val i = Intent(activity, ImageViewActivity::class.java)
+
+                        i.putExtra("image", holder.image)
+                        i.putExtra("imagePosition", holder.layoutPosition)
+                        val options = ActivityOptions.makeSceneTransitionAnimation(
+                            activity, holder.imageview,
+                            "image_to_full_transition"
+                        )
+                        startActivityForResult(i, UNFAVORITED_IMAGE_RESULT, options.toBundle())
+                    }
                 }
 
                 val menuAction: (View) -> Unit = throttleFirst(1000L, MainScope(), cb)
@@ -191,6 +201,9 @@ class FavoritesFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        // user returned from full image view. set load flag to false
+        loadRequested = false
 
         when (requestCode) {
             UNFAVORITED_IMAGE_RESULT -> {

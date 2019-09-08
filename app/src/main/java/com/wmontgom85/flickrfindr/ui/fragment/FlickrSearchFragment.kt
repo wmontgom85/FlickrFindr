@@ -53,6 +53,8 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
     private lateinit var suggestions : HashSet<String>
 
+    private var loadRequested = false
+
     // the list of images from search
     private var images : List<FlickrImage>? = null
 
@@ -338,15 +340,23 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
                 // create launch function for click action
                 val cb = fun(_ : View) {
-                    if (loading.visibility == View.VISIBLE) {
-                        // we're loading an image already. halt execution
-                        return
+                    // if the user taps two cards at once, it could potentially load both, causing
+                    // the transition back to fail and a blank card to be seen checking if
+                    // a load was requeste first before loading the image guarantees we're only
+                    // loading once, even when two cards are tapped
+                    if (!loadRequested) {
+                        loadRequested = true
+
+                        if (loading.visibility == View.VISIBLE) {
+                            // we're loading an image already. halt execution
+                            return
+                        }
+
+                        loading.visibility = View.VISIBLE
+
+                        // attempt image preload
+                        preloadThroughGlide(holder)
                     }
-
-                    loading.visibility = View.VISIBLE
-
-                    // attempt image preload
-                    preloadThroughGlide(holder)
                 }
 
                 // throttle card clicks
@@ -402,6 +412,8 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        loadRequested = false
 
         when (requestCode) {
             FAVORITED_IMAGE_RESULT -> {
