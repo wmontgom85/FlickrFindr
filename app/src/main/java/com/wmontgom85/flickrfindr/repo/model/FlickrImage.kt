@@ -47,7 +47,7 @@ data class FlickrImage (
      * @param bitmap Bitmap?
      */
     fun storeImage(context: Context, bitmap : Bitmap) {
-        bitmap?.let {
+        bitmap.let {
             val contextWrapper = ContextWrapper(context)
 
             // image director

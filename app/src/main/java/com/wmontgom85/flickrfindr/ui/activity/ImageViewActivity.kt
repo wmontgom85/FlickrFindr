@@ -80,7 +80,7 @@ class ImageViewActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
-        imageViewModel?.cancelRequest()
+        imageViewModel.cancelRequest()
     }
 
     /**
