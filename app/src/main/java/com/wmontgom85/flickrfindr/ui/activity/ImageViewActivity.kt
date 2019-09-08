@@ -231,6 +231,6 @@ class ImageViewActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK, data)
         }
 
-        finish()
+        supportFinishAfterTransition()
     }
 }
