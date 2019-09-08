@@ -210,7 +210,11 @@ class FavoritesFragment : Fragment() {
                 if (resultCode == Activity.RESULT_OK) {
                     data?.let {
                         if (it.getBooleanExtra("status_changed", false)) {
-                            updateImages(it.getIntExtra("imagePosition", -1), it.getStringExtra("imageId"))
+                            if (it.getBooleanExtra("favorited", false)) {
+                                reloadImages()
+                            } else {
+                                updateImages(it.getIntExtra("imagePosition", -1), it.getStringExtra("imageId"))
+                            }
                         }
                     }
                 }

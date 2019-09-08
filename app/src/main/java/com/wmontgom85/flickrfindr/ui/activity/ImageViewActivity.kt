@@ -230,6 +230,7 @@ class ImageViewActivity : AppCompatActivity() {
             val data = Intent()
             data.putExtra("status_changed", true)
             data.putExtra("imageId", image.id)
+            data.putExtra("favorited", isFavorited)
             data.putExtra("imagePosition", imagePosition)
             setResult(Activity.RESULT_OK, data)
         }
