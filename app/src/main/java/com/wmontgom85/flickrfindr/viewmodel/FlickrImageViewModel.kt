@@ -86,11 +86,11 @@ class FlickrImageViewModel(application: Application) : AndroidViewModel(applicat
 
         job = launch {
             flickrImageDao?.let { imgDao ->
-                // remove from db
-                imgDao.delete(img)
-
                 // remove local file
                 img.deleteImage()
+
+                // remove from db
+                imgDao.delete(img)
 
                 // make sure it was removed into the db
                 imageUnfavResult.postValue(imgDao.getImage(img.id)?.let { false } ?: run { true })

@@ -27,6 +27,7 @@ import kotlinx.android.synthetic.main.activity_image_view.*
 import kotlinx.android.synthetic.main.content_image_view.*
 import kotlinx.coroutines.MainScope
 import com.wmontgom85.flickrfindr.supp.blurTo
+import android.graphics.drawable.BitmapDrawable
 
 
 class ImageViewActivity : AppCompatActivity() {
@@ -39,7 +40,6 @@ class ImageViewActivity : AppCompatActivity() {
     private var favoriteStatusChanged = false
 
     private lateinit var imageViewModel: FlickrImageViewModel
-    private var imgBitmap : Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,8 +129,7 @@ class ImageViewActivity : AppCompatActivity() {
                     override fun onResourceReady( resource: Bitmap?, model: Any?, target: Target<Bitmap>?,
                         dataSource: DataSource?, isFirstResource: Boolean
                     ): Boolean {
-                        imgBitmap = resource // save the loaded bitmap so we have quick access to it
-                        setBackground(imgBitmap)
+                        setBackground(resource)
                         imageCB()
                         return false
                     }
@@ -191,7 +190,10 @@ class ImageViewActivity : AppCompatActivity() {
             true -> imageViewModel.unfavoriteImage(image)
             else -> {
                 // we need to store the image locally so we have path data to save into the db
-                imageViewModel.favoriteImage(image, imgBitmap!!)
+                val drawable = full_image.drawable as BitmapDrawable
+                val bitmap = drawable.bitmap
+
+                imageViewModel.favoriteImage(image, bitmap)
             }
         }
     }

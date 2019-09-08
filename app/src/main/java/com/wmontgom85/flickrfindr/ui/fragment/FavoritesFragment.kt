@@ -116,7 +116,6 @@ class FavoritesFragment : Fragment() {
      * Updates images after unfavoriting so that the autolayout animation can occur
      */
     fun updateImages(position : Int, imageId : String?) {
-        println("$position")
         favImages = favImages?.filter { image -> image.id != imageId }
         when (position > -1) {
             true -> adapter.notifyItemRemoved(position)
