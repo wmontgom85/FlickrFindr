@@ -77,8 +77,8 @@ class DBOperationUnitTest : CoroutineScope {
 
             imageDao.delete(anotherFlickrImage!!.id)
 
-            val anotehrDeletedImage: FlickrImage? = imageDao.getImage(randomId)
-            assertThat(anotehrDeletedImage, nullValue())
+            val anotherDeletedImage: FlickrImage? = imageDao.getImage(randomId)
+            assertThat(anotherDeletedImage, nullValue())
         }
     }
 
