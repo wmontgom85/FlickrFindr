@@ -21,7 +21,8 @@
                     android:layout_width="wrap_content"
                     android:minWidth="150dp"
                     android:layout_height="wrap_content"
-                    android:transitionName="image_to_full_transition"/>
+                    android:transitionName="image_to_full_transition"
+                    android:scaleType="centerCrop"/>
 
             <TextView
                     android:id="@+id/name"

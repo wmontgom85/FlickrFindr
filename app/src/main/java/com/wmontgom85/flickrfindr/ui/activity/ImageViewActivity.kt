@@ -114,7 +114,6 @@ class ImageViewActivity : AppCompatActivity() {
             Glide.with(this)
                 .asBitmap()
                 .load(image.getLargeImage())
-                .centerInside()
                 .listener(object : RequestListener<Bitmap> {
                     override fun onLoadFailed( e: GlideException?, model: Any?, target: Target<Bitmap>?,
                         isFirstResource: Boolean
