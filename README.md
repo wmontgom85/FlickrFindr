@@ -12,7 +12,7 @@ A sample FlickrFindr app
 *com.wmontgom85.flickrfindr.[everything else]*
 
 
-**Third part libraries (outside of Google) used:**
+**Third party libraries (outside of Android/Jetbrains) used:**
 
 1. Glide
   - For image processing/caching
