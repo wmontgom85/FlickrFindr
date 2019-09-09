@@ -12,10 +12,12 @@ import com.wmontgom85.flickrfindr.sealed.Result
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class FlickrSearchViewModel : ViewModel(), CoroutineScope {
-    private var job : Job? = null
+class FlickrSearchViewModel : ViewModel() {
+    private val parentJob = Job()
 
-    override val coroutineContext: CoroutineContext get() = Dispatchers.IO
+    private val coroutineContext: CoroutineContext get() = parentJob + Dispatchers.IO
+
+    private val scope = CoroutineScope(coroutineContext)
 
     // live data that will be populated as search results are returned
     val flickrImagesLiveData = MutableLiveData<ImageSearchResponse>()
@@ -26,12 +28,12 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
     @Suppress("UNCHECKED_CAST")
     fun performSearch(term : String, perPage: Int = 25, currentPage: Int = 1) {
         // cancel any previous requests so we don't stack up request processing
-        job?.cancel()
+        parentJob.cancelChildren()
 
         when {
             term.isNotBlank() -> {
                 ///launch the job
-                job = launch {
+                scope.launch {
                     val request = APIRequest().apply {
                         requestType = RequestType.POST
                         params = hashMapOf(
@@ -48,7 +50,7 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
                     val result = APIHandler.apiCall(request, FlickrJsonAdapter())
 
                     // make sure the job wasn't cancelled. if so, we need not send the previous result
-                    if (!job!!.isCancelled) {
+                    if (isActive) {
                         when (result) {
                             is Result.Success -> {
                                 flickrImagesLiveData.postValue(result.data as ImageSearchResponse)
@@ -65,5 +67,5 @@ class FlickrSearchViewModel : ViewModel(), CoroutineScope {
     }
 
     // cancels coroutine scope and all children
-    fun cancelRequest() = job?.cancel()
+    fun cancelRequest() = scope.cancel()
 }
