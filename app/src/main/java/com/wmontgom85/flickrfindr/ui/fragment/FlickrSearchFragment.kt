@@ -259,6 +259,8 @@ class FlickrSearchFragment : Fragment(), NumberPicker.OnValueChangeListener {
      */
     private fun refreshList(imageResponse : ImageSearchResponse?) {
         imageResponse?.let {
+            loadRequested = false
+
             images = it.photos // set the images list to the response images
             image_total.text = when (it.total) {
                 1L -> "1 result"
